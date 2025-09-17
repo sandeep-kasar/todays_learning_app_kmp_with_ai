@@ -1,4 +1,4 @@
-# Today's Learning - Sample KMP App  
+# Today's Learning - Sample KMP App with AI feature integration 
 
 Today's Learning is a multiplatform app built using **Kotlin** and **Compose Multiplatform**.  
 It helps students with their learning journey by offering features like **content summarization powered by Google Gemini** and a built-in chatbot for homework guidance.  
