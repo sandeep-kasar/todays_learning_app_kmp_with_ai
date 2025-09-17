@@ -7,23 +7,15 @@ It helps students with their learning journey by offering features like **conten
 
 #### Mobile App (Android)
 
-<img src="media/android_1.jpeg" height="300"/>  
-<img src="media/android_2.jpeg" height="300"/>  
-<img src="media/android_3.jpeg" height="300"/>  
-<img src="media/android_5.jpeg" height="300"/>  
-<img src="media/android_4.jpeg" height="300"/>  
+<img src="media/android_1.jpeg" height="300"/>  <img src="media/android_2.jpeg" height="300"/>  <img src="media/android_3.jpeg" height="300"/>  <img src="media/android_5.jpeg" height="300"/>  <img src="media/android_4.jpeg" height="300"/>  
 
 #### Mobile App (iOS)
 
-<img src="media/ios_1.jpeg" height="300"/>  
-<img src="media/ios_2.jpeg" height="300"/>  
-<img src="media/ios_3.jpeg" height="300"/>  
-<img src="media/ios_4.jpeg" height="300"/>  
+<img src="media/ios_1.jpeg" height="300"/>  <img src="media/ios_2.jpeg" height="300"/>  <img src="media/ios_3.jpeg" height="300"/>  <img src="media/ios_4.jpeg" height="300"/>  
 
 #### Desktop App
 
-<img src="media/desktop1.jpeg" height="300"/>  
-<img src="media/desktop2.jpeg" height="300"/>  
+<img src="media/desktop1.jpeg" height="300"/>  <img src="media/desktop2.jpeg" height="300"/>  
 
 ## Built with 🛠️
 
