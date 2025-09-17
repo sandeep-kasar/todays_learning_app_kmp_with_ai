@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<resources>
+    <string name="title_home">Learning</string>
+    <string name="title_calender">Calender</string>
+    <string name="title_me">Profile</string>
+    <string name="title_details">Details</string>
+
+    <!--Preference Headers-->
+    <string name="change_theme">Change theme</string>
+
+    <!--Preference Titles-->
+    <string name="title_personalisation">Personalisation</string>
+
+    <string-array name="themes">
+        <item>Light theme</item>
+        <item>Dark theme</item>
+        <item>System default</item>
+    </string-array>
+
+    <string-array name="image_qualities">
+        <item>High Quality</item>
+        <item>Low Quality</item>
+    </string-array>
+
+
+</resources>
