@@ -153,7 +153,7 @@ fun DetailsScreen(
 
 @Composable
 fun SubjectTabs(viewModel: DetailsViewModel) {
-    val tabs = listOf("Learning", "Homework", "In short Gemini", "In short Gpt", "Ask Me")
+    val tabs = listOf("Learning", "Homework", "In short Gemini", "In short Gpt")
     val selectedTab by viewModel.selectedTabState.collectAsState()
     val subjectDetails by viewModel.subjectDetailsState.collectAsState()
 

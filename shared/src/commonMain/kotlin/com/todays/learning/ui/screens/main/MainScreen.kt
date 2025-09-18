@@ -33,6 +33,7 @@ fun MainScreen(viewModel: MainViewModel = koinViewModel<MainViewModel>()) {
 
         val topLevelDestinations = listOf(
             NavigationItem.Home,
+            NavigationItem.Chat,
             NavigationItem.Calender,
             NavigationItem.Me
         )

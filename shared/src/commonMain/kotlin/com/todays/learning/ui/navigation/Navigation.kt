@@ -8,6 +8,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
 import com.todays.learning.ui.screens.calender.CalenderScreen
+import com.todays.learning.ui.screens.chat.ChatScreen
 import com.todays.learning.ui.screens.details.DetailsScreen
 import com.todays.learning.utils.WindowSize
 import com.todays.learning.ui.screens.home.HomeScreen
@@ -25,6 +26,12 @@ fun Navigation(
             HomeScreen(
                 navigator = navHostController,
                 windowSize = windowSize,
+                mainPaddingValues = mainPaddingValues
+            )
+        }
+
+        composable(route = NavigationItem.Chat.route) {
+            ChatScreen(
                 mainPaddingValues = mainPaddingValues
             )
         }
