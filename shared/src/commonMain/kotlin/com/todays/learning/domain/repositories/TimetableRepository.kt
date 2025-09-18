@@ -27,9 +27,4 @@ interface TimetableRepository {
         apiKey: String,
     ): Result<Flow<String>>
 
-    suspend fun askMe(
-        prompt: String,
-        apiKey: String,
-    ): Result<Flow<String>>
-
 }

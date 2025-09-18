@@ -78,7 +78,6 @@ fun commonModule(enableNetworkLogs: Boolean) = module {
     viewModelOf(::HomeViewModel)
     viewModelOf(::DetailsViewModel)
     viewModelOf(::MeViewModel)
-    viewModelOf(::ChatViewModel)
 }
 
 

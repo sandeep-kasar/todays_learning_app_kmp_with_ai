@@ -21,29 +21,20 @@ import io.ktor.client.request.header
 import io.ktor.client.request.post
 import io.ktor.client.request.setBody
 import io.ktor.client.statement.HttpResponse
-import io.ktor.client.statement.bodyAsChannel
 import io.ktor.client.statement.bodyAsText
 import io.ktor.http.ContentType
 import io.ktor.http.HttpHeaders
 import io.ktor.http.appendPathSegments
 import io.ktor.http.contentType
-import io.ktor.http.isSuccess
-import kotlinx.coroutines.NonCancellable.isActive
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonArray
 import kotlinx.serialization.json.JsonElement
 import kotlinx.serialization.json.JsonObject
 import kotlinx.serialization.json.JsonPrimitive
-import kotlinx.serialization.json.buildJsonArray
-import kotlinx.serialization.json.buildJsonObject
-import kotlinx.serialization.json.contentOrNull
 import kotlinx.serialization.json.jsonArray
 import kotlinx.serialization.json.jsonObject
-import kotlinx.serialization.json.jsonPrimitive
-import kotlinx.serialization.json.put
 
 class TimetableRepositoryImpl(
     private val httpClient: HttpClient
@@ -215,130 +206,4 @@ class TimetableRepositoryImpl(
             Result.failure(e)
         }
     }
-
-
-    override suspend fun askMe(
-        prompt: String,
-        apiKey: String
-    ): Result<Flow<String>> {
-        return try {
-            val url = "https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:streamGenerateContent?key=$apiKey"
-
-            val requestBody = buildJsonObject {
-                put("contents", buildJsonArray {
-                    add(buildJsonObject {
-                        put("role", "user")
-                        put("parts", buildJsonArray {
-                            add(buildJsonObject {
-                                put("text", prompt)
-                            })
-                        })
-                    })
-                })
-                put("generationConfig", buildJsonObject {
-                    put("temperature", 0.7)
-                    put("maxOutputTokens", 2048)
-                    put("topP", 0.8)
-                    put("topK", 40)
-                })
-                put("safetySettings", buildJsonArray {
-                    add(buildJsonObject {
-                        put("category", "HARM_CATEGORY_HARASSMENT")
-                        put("threshold", "BLOCK_NONE")
-                    })
-                })
-            }.toString()
-
-            val sseFlow: Flow<String> = flow {
-                val response: HttpResponse = httpClient.post(url) {
-                    header("x-goog-api-key", apiKey)
-                    header(HttpHeaders.Accept, "text/event-stream")
-                    contentType(ContentType.Application.Json)
-                    setBody(requestBody)
-                    // If your client supports timeouts, ensure a generous read timeout for long generations
-                }
-
-                if (!response.status.isSuccess()) {
-                    val txt = response.bodyAsText()
-                    throw IllegalStateException("Upstream error ${response.status}: $txt")
-                }
-
-                val channel = response.bodyAsChannel()
-
-                // We will read lines until channel closes or coroutine cancelled
-                // SSE format: lines prefixed with "event: ..." and "data: <json>"
-                val dataBuffer = StringBuilder()
-                while (isActive) {
-                    val line = channel.readUTF8Line(1000) ?: break
-                    // debug: you can log raw line here to troubleshoot
-                    // Log.d("SSE", line)
-
-                    // Many SSE endpoints send blank lines between events
-                    if (line.isBlank()) {
-                        // End of a single SSE event. If we've accumulated data lines, process them.
-                        if (dataBuffer.isNotBlank()) {
-                            val dataText = dataBuffer.toString().trim()
-                            dataBuffer.clear()
-
-                            // Some SSE servers send "data: [ ... ]" (array) or "data: {...}"
-                            // Also skip sentinel messages like "[DONE]" or "done"
-                            if (dataText == "[DONE]" || dataText == "\"[DONE]\"" || dataText.equals(
-                                    "done",
-                                    true
-                                )
-                            ) {
-                                break
-                            }
-
-                            // Try parsing JSON; ignore parse errors for non-JSON control messages
-                            try {
-                                val jsonElem = Json.parseToJsonElement(dataText)
-
-                                val txt = jsonElem.jsonObject["candidates"]
-                                    ?.jsonArray?.getOrNull(0)
-                                    ?.jsonObject
-                                    ?.get("content")
-                                    ?.jsonObject
-                                    ?.get("parts")
-                                    ?.jsonArray?.getOrNull(0)
-                                    ?.jsonObject
-                                    ?.get("text")
-                                    ?.jsonPrimitive
-                                    ?.content
-
-                                if (!txt.isNullOrBlank()) {
-                                    emit(txt)
-                                } else if (jsonElem is kotlinx.serialization.json.JsonPrimitive) {
-                                    // fallback: if the payload itself is just a string
-                                    val maybeStr = jsonElem.contentOrNull
-                                    if (!maybeStr.isNullOrBlank()) emit(maybeStr)
-                                }
-                            } catch (e: Exception) {
-                                // ignore parse errors
-                            }
-
-                        }
-                        continue
-                    }
-
-                    // Only consider lines starting with "data:"; other lines can be safely ignored for now.
-                    if (line.startsWith("data:")) {
-                        // everything after "data:" can be JSON or part of a JSON stream
-                        val after = line.removePrefix("data:").trimStart()
-                        dataBuffer.append(after)
-                        // Note: do NOT emit here — wait until blank line which marks end of event
-                    } else {
-                        // There may be "event:" lines or other metadata; ignore unless debugging
-                    }
-                } // while
-
-            }
-
-            Result.success(sseFlow)
-        } catch (t: Throwable) {
-            Result.failure(t)
-        }
-    }
-
-
 }

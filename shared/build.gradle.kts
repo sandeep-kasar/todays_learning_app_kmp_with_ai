@@ -55,6 +55,7 @@ kotlin {
             implementation(libs.bundles.coil)
             implementation(libs.kotlinX.serializationJson)
             implementation(libs.compose.calender)
+            implementation(libs.generativeai.google)
         }
 
         androidMain.dependencies {
@@ -62,16 +63,19 @@ kotlin {
             implementation(libs.koin.android)
             implementation(libs.koin.androidx.compose)
             implementation(libs.androidX.activity)
+            implementation(libs.calf.filepicker)
         }
 
         iosMain.dependencies {
             implementation(libs.ktor.darwin)
+            implementation(libs.calf.filepicker)
         }
 
         desktopMain.dependencies {
             implementation(libs.ktor.java)
             implementation(libs.coroutines.swing)
             implementation(compose.desktop.currentOs)
+            implementation(libs.calf.filepicker)
         }
     }
 }
