@@ -2,7 +2,6 @@ package com.todays.learning.ui.screens.chat
 
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
@@ -18,6 +17,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.unit.dp
 import com.todays.learning.service.GenerativeAiService
 import com.todays.learning.ui.components.ChatBubbleItem
 import com.todays.learning.ui.components.MessageInput
@@ -28,14 +28,13 @@ import kotlinx.coroutines.launch
 @Composable
 fun ChatScreen(
     chatViewModel: ChatViewModel = remember { ChatViewModel(GenerativeAiService.instance) },
-    mainPaddingValues: PaddingValues,
 ) {
     val chatUiState = chatViewModel.uiState
     val coroutineScope = rememberCoroutineScope()
     val listState = rememberLazyListState()
 
     Scaffold(
-        modifier = Modifier.fillMaxSize().padding(mainPaddingValues),
+        modifier = Modifier.fillMaxSize().padding(bottom = 70.dp),
         topBar = { AppBar("Ask Me") }
     ) { paddingValues ->
         Column(

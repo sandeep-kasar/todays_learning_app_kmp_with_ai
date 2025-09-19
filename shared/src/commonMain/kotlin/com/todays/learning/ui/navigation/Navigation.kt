@@ -31,9 +31,7 @@ fun Navigation(
         }
 
         composable(route = NavigationItem.Chat.route) {
-            ChatScreen(
-                mainPaddingValues = mainPaddingValues
-            )
+            ChatScreen()
         }
 
         composable(route = NavigationItem.Calender.route) {
