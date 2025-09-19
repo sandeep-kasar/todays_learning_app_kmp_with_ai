@@ -1,4 +1,4 @@
-package org.todays.learning
+package com.todays.learning
 
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.unit.dp

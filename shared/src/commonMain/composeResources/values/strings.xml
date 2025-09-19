@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <resources>
     <string name="title_home">Learning</string>
+    <string name="title_chat">Ask Me</string>
     <string name="title_calender">Calender</string>
     <string name="title_me">Profile</string>
     <string name="title_details">Details</string>

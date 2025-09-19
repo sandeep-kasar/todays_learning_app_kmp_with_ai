@@ -1,6 +1,6 @@
 import Foundation
 import SwiftUI
-import TodaysLearningApp
+import shared
 
 
 struct ComposeView:UIViewControllerRepresentable{

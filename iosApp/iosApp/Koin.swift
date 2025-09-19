@@ -1,7 +1,7 @@
 // koin injection in swift
 // https://medium.com/@uwaisalqadri/elegant-koin-injection-for-swift-in-kotlin-multiplatform-mobile-9a803f6efb2e
 
-import TodaysLearningApp
+import shared
 import Foundation
 
 typealias KoinApplication = Koin_coreKoinApplication
