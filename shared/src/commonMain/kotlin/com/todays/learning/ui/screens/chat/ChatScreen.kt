@@ -18,6 +18,8 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import com.todays.learning.Platform
+import com.todays.learning.getPlatform
 import com.todays.learning.service.GenerativeAiService
 import com.todays.learning.ui.components.ChatBubbleItem
 import com.todays.learning.ui.components.MessageInput
@@ -29,12 +31,22 @@ import kotlinx.coroutines.launch
 fun ChatScreen(
     chatViewModel: ChatViewModel = remember { ChatViewModel(GenerativeAiService.instance) },
 ) {
+
+    val platform: Platform = getPlatform()
     val chatUiState = chatViewModel.uiState
     val coroutineScope = rememberCoroutineScope()
     val listState = rememberLazyListState()
 
     Scaffold(
-        modifier = Modifier.fillMaxSize().padding(bottom = 70.dp),
+        modifier = Modifier
+            .fillMaxSize()
+            .then(
+                if (platform.name.contains("Desktop")) {
+                    Modifier // no extra padding
+                } else {
+                    Modifier.padding(bottom = 70.dp) // mobile platforms
+                }
+            ),
         topBar = { AppBar("Ask Me") }
     ) { paddingValues ->
         Column(
