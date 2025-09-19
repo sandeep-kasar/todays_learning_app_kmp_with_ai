@@ -2,9 +2,12 @@ package com.todays.learning.ui.screens.details
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.todays.learning.data.mappers.toDomain
+import com.todays.learning.data.network.models.subject.SubjectResultDto
 import com.todays.learning.domain.repositories.TimetableRepository
 import com.todays.learning.utils.DetailsUiState
 import com.todays.learning.utils.GptSummaryUiState
+import com.todays.learning.utils.fallbackSubjectJson
 import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.Flow
@@ -13,6 +16,7 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import kotlinx.serialization.json.Json
 
 /**
  * ViewModel for the Details screen.
@@ -51,8 +55,26 @@ class DetailsViewModel(
                             it.copy(subjectDetails = subjectDetails, isLoading = false)
                         }
                     }
-                }.onFailure { error ->
-                    _subjectDetailsState.update { it.copy(error = error.message, isLoading = false) }
+                }
+                .onFailure { error ->
+                    try {
+                        // Decode fallback JSON into your DTO
+                        val fallback = Json.decodeFromString<SubjectResultDto>(fallbackSubjectJson)
+
+                        _subjectDetailsState.update {
+                            it.copy(
+                                subjectDetails = fallback.result?.toDomain(),
+                                isLoading = false,
+                            )
+                        }
+                    } catch (e: Exception) {
+                        _subjectDetailsState.update {
+                            it.copy(
+                                error = "Failed to load subject details: ${error.message}",
+                                isLoading = false
+                            )
+                        }
+                    }
                 }
         }
     }
