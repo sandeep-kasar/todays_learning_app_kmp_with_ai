@@ -58,6 +58,7 @@ fun DetailsScreen(
     val subjectDetailsState by viewModel.subjectDetailsState.collectAsState()
     val selectedTabState by viewModel.selectedTabState.collectAsState()
     val gptSummaryState by viewModel.gptSummaryState.collectAsState()
+    val uiStateTts by viewModel.uiStateTts.collectAsState()
 
     Scaffold(
         topBar = {

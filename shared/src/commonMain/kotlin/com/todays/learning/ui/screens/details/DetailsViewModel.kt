@@ -4,10 +4,14 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.todays.learning.data.mappers.toDomain
 import com.todays.learning.data.network.models.subject.SubjectResultDto
+import com.todays.learning.domain.repositories.AiTaskRepository
 import com.todays.learning.domain.repositories.TimetableRepository
+import com.todays.learning.domain.utils.Constants.GEMINI_API_KEY
 import com.todays.learning.utils.DetailsUiState
 import com.todays.learning.utils.GptSummaryUiState
+import com.todays.learning.utils.TtsUiState
 import com.todays.learning.utils.fallbackSubjectJson
+import com.todays.learning.utils.playAudioBytes
 import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.Flow
@@ -16,6 +20,7 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import kotlinx.datetime.Clock.System
 import kotlinx.serialization.json.Json
 
 /**
@@ -23,7 +28,8 @@ import kotlinx.serialization.json.Json
  * Handles subject details and AI-powered learning summaries.
  */
 class DetailsViewModel(
-    private val timetableRepository: TimetableRepository
+    private val timetableRepository: TimetableRepository,
+    private val aiTaskRepository: AiTaskRepository,
 ) : ViewModel() {
 
     private val _selectedTabState = MutableStateFlow(0)
@@ -35,6 +41,10 @@ class DetailsViewModel(
     private val _gptSummaryState = MutableStateFlow(GptSummaryUiState())
     val gptSummaryState = _gptSummaryState.asStateFlow()
 
+    private val _uiStateTts = MutableStateFlow(TtsUiState())
+    val uiStateTts = _uiStateTts.asStateFlow()
+
+
     // Track active summary job to cancel ongoing summaries
     private var summaryJob: Job? = null
 
@@ -42,6 +52,7 @@ class DetailsViewModel(
     private val coroutineExceptionHandler = CoroutineExceptionHandler { _, exception ->
         _subjectDetailsState.update { it.copy(isLoading = false, error = exception.message) }
         _gptSummaryState.update { it.copy(isLoading = false, error = exception.message) }
+        _uiStateTts.value = _uiStateTts.value.copy(isLoading = false, error = exception.message)
     }
 
     fun getSubjectDetails(subject: String) {
@@ -112,10 +123,56 @@ class DetailsViewModel(
     }
 
     fun summarizeLearningUsingGpt(text: String, apiKey: String) {
-        summarizeLearningInternal(text, apiKey, timetableRepository::summarizeLearning)
+        summarizeLearningInternal(text, apiKey, aiTaskRepository::summarizeLearning)
     }
 
     fun summarizeLearningUsingGemini(text: String, apiKey: String) {
-        summarizeLearningInternal(text, apiKey, timetableRepository::summarizeLearningUsingGemini)
+        summarizeLearningInternal(text, apiKey, aiTaskRepository::summarizeLearningUsingGemini)
     }
+
+    /**
+     * Synthesize `subject` into audio and play it on the platform.
+     * Uses the aiTaskRepository.synthesizeToBytes which returns Result<Flow<ByteArray>>.
+     */
+    fun speak(summary: String) {
+        if (summary.isBlank()) {
+            _uiStateTts.update { it.copy(error = "Text is empty", isLoading = false) }
+            return
+        }
+
+        _uiStateTts.update { it.copy(isLoading = true, error = null) }
+
+        viewModelScope.launch(coroutineExceptionHandler) {
+            try {
+                val apiKey = GEMINI_API_KEY
+                val result = aiTaskRepository.synthesizeToBytes(summary = summary, apiKey = apiKey)
+
+                result.onSuccess { byteFlow ->
+                        collectAndPlay(byteFlow)
+                    }
+                    .onFailure { err ->
+                        _uiStateTts.update { it.copy(isLoading = false, error = err.message) }
+                    }
+            } catch (e: Exception) {
+                _uiStateTts.update { it.copy(isLoading = false, error = e.message) }
+            }
+        }
+    }
+
+    private suspend fun collectAndPlay(flow: Flow<ByteArray>) {
+        try {
+            flow.collectLatest { bytes ->
+                _uiStateTts.update { it.copy(isLoading = true, error = null) }
+
+                // call platform playback (suspend)
+                playAudioBytes(bytes, "tts_${System.now()}.mp3")
+
+                // after playback completed successfully, update state
+                _uiStateTts.update { it.copy(isLoading = false, error = null) }
+            }
+        } catch (e: Exception) {
+            _uiStateTts.update { it.copy(isLoading = false, error = e.message) }
+        }
+    }
+
 }

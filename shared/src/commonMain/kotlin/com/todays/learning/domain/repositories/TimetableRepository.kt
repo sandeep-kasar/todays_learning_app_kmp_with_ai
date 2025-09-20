@@ -16,15 +16,4 @@ interface TimetableRepository {
     suspend fun fetchSubjectDetails(
         subject: String,
     ): Result<Flow<Subject?>>
-
-    suspend fun summarizeLearning(
-        subject: String,
-        apiKey: String,
-    ): Result<Flow<String>>
-
-    suspend fun summarizeLearningUsingGemini(
-        subject: String,
-        apiKey: String,
-    ): Result<Flow<String>>
-
 }

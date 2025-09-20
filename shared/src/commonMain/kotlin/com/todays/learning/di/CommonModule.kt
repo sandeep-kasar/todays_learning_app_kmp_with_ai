@@ -1,16 +1,17 @@
 package com.todays.learning.di
 
 
+import com.todays.learning.data.datasources.AiTaskRepositoryImpl
 import com.todays.learning.data.datasources.SettingsRepositoryImpl
 import com.todays.learning.data.datasources.TimetableRepositoryImpl
+import com.todays.learning.domain.repositories.AiTaskRepository
 import com.todays.learning.domain.repositories.SettingsRepository
 import com.todays.learning.domain.repositories.TimetableRepository
 import com.todays.learning.domain.utils.Constants.BASE_URL
 import com.todays.learning.domain.utils.Constants.URL_PATH
-import com.todays.learning.ui.screens.chat.ChatViewModel
+import com.todays.learning.ui.screens.details.DetailsViewModel
 import com.todays.learning.ui.screens.home.HomeViewModel
 import com.todays.learning.ui.screens.main.MainViewModel
-import com.todays.learning.ui.screens.details.DetailsViewModel
 import com.todays.learning.ui.screens.me.MeViewModel
 import io.github.aakira.napier.DebugAntilog
 import io.github.aakira.napier.Napier
@@ -71,6 +72,7 @@ fun commonModule(enableNetworkLogs: Boolean) = module {
     }
 
     single<TimetableRepository> { TimetableRepositoryImpl(httpClient = get()) }
+    single<AiTaskRepository> { AiTaskRepositoryImpl(httpClient = get()) }
     single<SettingsRepository> { SettingsRepositoryImpl() }
 
     // ViewModels
